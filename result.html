@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Resultado — API Console</title>
+<meta name="description" content="Resposta JSON da consulta à API." />
+<link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+<header class="site-header">
+  <div class="container">
+    <a href="./index.html" class="brand">
+      <span class="brand-mark">◈</span>
+      <span>API Console</span>
+    </a>
+    <nav>
+      <a href="#" id="back-link" class="nav-link">← Nova consulta</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+  <section class="panel">
+    <div class="panel-head result-head">
+      <div>
+        <h1 id="result-title">Resultado</h1>
+        <p id="result-meta" class="muted"></p>
+      </div>
+      <div class="result-actions">
+        <span id="status-badge" class="badge">--</span>
+        <button id="copy-btn"     class="btn btn-ghost" type="button">Copiar JSON</button>
+        <button id="download-btn" class="btn btn-ghost" type="button">Baixar .json</button>
+      </div>
+    </div>
+
+    <div id="loading" class="loading">Consultando API...</div>
+    <div id="error"   class="error hidden"></div>
+
+    <!-- Chain action button (shown after successful auth in chain flows) -->
+    <button id="chain-action" class="btn btn-primary chain-btn hidden" type="button"></button>
+
+    <pre id="json-output" class="json-output hidden"></pre>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <small>© API Console — uso interno da equipe.</small>
+  </div>
+</footer>
+
+<script src="./app.js"></script>
+<script src="./result.js"></script>
+</body>
+</html>

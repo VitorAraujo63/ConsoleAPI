@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>API Console — Consultas Integradas</title>
+<meta name="description" content="Console interno para consultas em APIs externas: Mercado Livre, Correios e JadLog." />
+<link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+<header class="site-header">
+  <div class="container">
+    <a href="./index.html" class="brand">
+      <span class="brand-mark">◈</span>
+      <span>API Console</span>
+    </a>
+    <nav>
+      <a href="./index.html" class="nav-link active">APIs</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+  <section class="hero">
+    <h1>Consultas em APIs externas</h1>
+    <p>Selecione uma API abaixo para preencher os parâmetros e visualizar a resposta em JSON.</p>
+  </section>
+
+  <section class="grid">
+    <a class="card" id="card-mercadolivre" href="./details.html?api=mercadolivre">
+      <div class="card-icon" style="background:#ffffff;"><img src="img/mercado-livre.svg" alt="Mercado Livre"></div>
+      <h2>Mercado Livre</h2>
+      <p>Consulta de pedidos, envios e qualidade de catálogo via Access Token.</p>
+      <span class="card-cta">Consultar →</span>
+    </a>
+
+    <a class="card" id="card-correios" href="./details.html?api=correios">
+      <div class="card-icon" style="background:#ffffff;"><img src="img/correios.svg" alt="Correios"></div>
+      <h2>Correios</h2>
+      <p>Autenticação com cartão de postagem e consulta de preço de frete nacional.</p>
+      <span class="card-cta">Consultar →</span>
+    </a>
+
+    <a class="card" id="card-jadlog" href="./details.html?api=jadlog">
+      <div class="card-icon" style="background:#ffffff;"><img src="img/jadlog.png" alt="JadLog"></div>
+      <h2>JadLog</h2>
+      <p>Cotação de frete via API do embarcador JadLog (modalidades e prazos).</p>
+      <span class="card-cta">Consultar →</span>
+    </a>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <small>© API Console — uso interno da equipe.</small>
+  </div>
+</footer>
+
+<script src="./app.js"></script>
+</body>
+</html>

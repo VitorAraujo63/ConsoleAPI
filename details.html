@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Detalhes da API — API Console</title>
+<meta name="description" content="Preencha os parâmetros para consultar a API selecionada." />
+<link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+<header class="site-header">
+  <div class="container">
+    <a href="./index.html" class="brand">
+      <span class="brand-mark">◈</span>
+      <span>API Console</span>
+    </a>
+    <nav>
+      <a href="./index.html" class="nav-link">← Voltar às APIs</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+  <section class="panel">
+    <div class="panel-head">
+      <h1 id="api-title">Carregando...</h1>
+      <p id="api-desc" class="muted"></p>
+    </div>
+
+    <div id="endpoint-picker" class="endpoint-picker"></div>
+
+    <form id="query-form" class="form">
+      <div id="fields"></div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Consultar</button>
+        <button type="reset" class="btn btn-ghost">Limpar</button>
+      </div>
+    </form>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <small>© API Console — uso interno da equipe.</small>
+  </div>
+</footer>
+
+<script src="./app.js"></script>
+<script src="./details.js"></script>
+</body>
+</html>
