@@ -48,7 +48,7 @@ window.API_REGISTRY = {
           },
         ],
         build: (p) => ({
-          url: `https://api.mercadolibre.com/orders/${encodeURIComponent(p.orderId)}`,
+          url: proxyUrl(`https://api.mercadolibre.com/orders/${encodeURIComponent(p.orderId)}`),
           options: {
             method: "GET",
             headers: { Authorization: `Bearer ${p.accessToken}` },
@@ -76,7 +76,7 @@ window.API_REGISTRY = {
           },
         ],
         build: (p) => ({
-          url: `https://api.mercadolibre.com/shipments/${encodeURIComponent(p.shipmentId)}`,
+          url: proxyUrl(`https://api.mercadolibre.com/shipments/${encodeURIComponent(p.shipmentId)}`),
           options: {
             method: "GET",
             headers: { Authorization: `Bearer ${p.accessToken}` },
@@ -104,7 +104,7 @@ window.API_REGISTRY = {
           },
         ],
         build: (p) => ({
-          url: `https://api.mercadolibre.com/catalog_quality/status?item_id=${encodeURIComponent(p.itemId)}`,
+          url: proxyUrl(`https://api.mercadolibre.com/catalog_quality/status?item_id=${encodeURIComponent(p.itemId)}`),
           options: {
             method: "GET",
             headers: { Authorization: `Bearer ${p.accessToken}` },
