@@ -6,6 +6,7 @@
 <title>Detalhes da API — API Console</title>
 <meta name="description" content="Preencha os parâmetros para consultar a API selecionada." />
 <link rel="stylesheet" href="./styles.css" />
+<script src="https://unpkg.com/imask@7.6.1/dist/imask.min.js" defer></script>
 </head>
 <body>
 <header class="site-header">
@@ -37,6 +38,15 @@
       </div>
     </form>
   </section>
+
+  <!-- Histórico de requisições recentes -->
+  <section id="history-panel" class="panel history-panel hidden">
+    <div class="history-header" id="history-toggle">
+      <h2>Últimas Requisições</h2>
+      <span class="history-chevron" id="history-chevron">▾</span>
+    </div>
+    <div id="history-list" class="history-list"></div>
+  </section>
 </main>
 
 <footer class="site-footer">
@@ -54,3 +64,4 @@
 <script src="./details.js"></script>
 </body>
 </html>
+

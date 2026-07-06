@@ -51,6 +51,16 @@
     });
   }
 
+  // ── Mapa de máscaras por nome de campo ─────────────────────
+  const MASK_MAP = {
+    cepOrigem:  { mask: "00000-000" },
+    cepDestino: { mask: "00000-000" },
+    cepori:     { mask: "00000-000" },
+    cepdes:     { mask: "00000-000" },
+    cnpj:       { mask: "00.000.000/0000-00" },
+    numero:     { mask: "0000000000" },
+  };
+
   // ── Fields ──────────────────────────────────────────────────
   function renderFields() {
     const ep = api.endpoints.find((e) => e.id === currentEndpointId);
@@ -128,7 +138,31 @@
         wrap.appendChild(hint);
       }
 
+      // ── Alerta dinâmico para vlDeclarado ────────────────────
+      if (f.name === "vlDeclarado") {
+        const alertBox = document.createElement("div");
+        alertBox.className = "field-alert warning hidden";
+        alertBox.id = "vlDeclarado-alert";
+        alertBox.textContent =
+          "⚠️ Atenção: Os serviços adicionais 019 (Valor Declarado) e 001 (Aviso de Recebimento) serão incluídos automaticamente nesta requisição.";
+        wrap.appendChild(alertBox);
+
+        input.addEventListener("input", () => {
+          const val = input.value.trim();
+          if (val !== "" && parseFloat(val) > 0) {
+            alertBox.classList.remove("hidden");
+          } else {
+            alertBox.classList.add("hidden");
+          }
+        });
+      }
+
       fieldsEl.appendChild(wrap);
+
+      // ── Aplicar máscara IMask (se disponível) ────────────────
+      if (typeof IMask !== "undefined" && MASK_MAP[f.name] && input.tagName === "INPUT") {
+        IMask(input, MASK_MAP[f.name]);
+      }
     });
 
     // Update submit button label for chain step 1
@@ -167,6 +201,77 @@
     }
   });
 
+  // ── Histórico de Requisições ────────────────────────────────
+  function renderHistory() {
+    const panel   = document.getElementById("history-panel");
+    const listEl  = document.getElementById("history-list");
+    const toggle  = document.getElementById("history-toggle");
+    const chevron = document.getElementById("history-chevron");
+    if (!panel || !listEl) return;
+
+    let history = [];
+    try { history = JSON.parse(localStorage.getItem("historico_console") || "[]"); }
+    catch (_) {}
+
+    if (history.length === 0) {
+      panel.classList.add("hidden");
+      return;
+    }
+
+    panel.classList.remove("hidden");
+    listEl.innerHTML = "";
+
+    // Toggle expand/collapse
+    toggle.onclick = () => {
+      listEl.classList.toggle("open");
+      chevron.classList.toggle("open");
+    };
+
+    history.forEach((entry, idx) => {
+      const item = document.createElement("div");
+      item.className = "history-item";
+      item.title = "Clique para repetir esta consulta";
+
+      const time = new Date(entry.time);
+      const timeStr = time.toLocaleString("pt-BR", {
+        day: "2-digit", month: "2-digit",
+        hour: "2-digit", minute: "2-digit",
+      });
+
+      item.innerHTML = `
+        <div class="history-item-info">
+          <span class="history-item-title">${entry.apiTitle || entry.api} → ${entry.endpointLabel || entry.endpoint}</span>
+          <span class="history-item-time">${timeStr}</span>
+        </div>
+        <span class="history-item-badge ${entry.ok ? "ok" : "err"}">${entry.status}</span>
+      `;
+
+      item.addEventListener("click", () => {
+        // Replay: navigate to the same details page with prefilled params
+        const q = new URLSearchParams({
+          api:      entry.api,
+          endpoint: entry.endpoint,
+          prefill:  JSON.stringify(entry.params || {}),
+        });
+        location.href = `./details.html?${q.toString()}`;
+      });
+
+      listEl.appendChild(item);
+    });
+
+    // Botão de limpar histórico
+    const clearBtn = document.createElement("button");
+    clearBtn.className = "history-clear";
+    clearBtn.textContent = "🗑 Limpar histórico";
+    clearBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      localStorage.removeItem("historico_console");
+      renderHistory();
+    });
+    listEl.appendChild(clearBtn);
+  }
+
   renderPicker();
   renderFields();
+  renderHistory();
 })();

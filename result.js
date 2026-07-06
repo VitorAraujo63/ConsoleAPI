@@ -52,6 +52,24 @@
       outputEl.innerHTML = APIUtils.syntaxHighlight(json);
       outputEl.classList.remove("hidden");
 
+      // ── Salvar no histórico (localStorage) ────────────────────
+      try {
+        const histEntry = {
+          api: apiKey,
+          apiTitle: api.title,
+          endpoint: endpointId,
+          endpointLabel: endpoint.label,
+          status: res.status,
+          ok: res.ok,
+          time: new Date().toISOString(),
+          params: inputParams,
+        };
+        const MAX_HISTORY = 15;
+        const history = JSON.parse(localStorage.getItem("historico_console") || "[]");
+        history.unshift(histEntry);
+        localStorage.setItem("historico_console", JSON.stringify(history.slice(0, MAX_HISTORY)));
+      } catch (_) { /* localStorage indisponível — ignora silenciosamente */ }
+
       // ── Chain flow (Correios auth → price) ──────────────────
       if (isChain && endpoint.chainTo && endpoint.chainExtract && res.ok) {
         const { api: nextApi, endpoint: nextEp } = endpoint.chainTo;

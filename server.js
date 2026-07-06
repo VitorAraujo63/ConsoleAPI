@@ -11,8 +11,15 @@ const path    = require("path");
 const app  = express();
 const PORT = 3000;
 
+// ── Segurança ──────────────────────────────────────────────
+// Domínios permitidos pelo proxy (previne ataques SSRF)
+const ALLOWED_DOMAINS = [
+  "api.correios.com.br",
+  "www.jadlog.com.br",
+];
+
 // ── Middleware ──────────────────────────────────────────────
-app.use(express.json());
+app.use(express.json({ limit: "2mb" }));  // Limita payload para prevenir sobrecarga de memória
 app.use(express.static(path.join(__dirname)));   // Serve os arquivos HTML/CSS/JS
 
 // ── Rota genérica de proxy ──────────────────────────────────
@@ -23,6 +30,20 @@ app.all("/proxy", async (req, res) => {
 
   if (!targetUrl) {
     return res.status(400).json({ error: "Parâmetro 'url' ausente na query." });
+  }
+
+  // ── Validação SSRF: só permite domínios da whitelist ──────
+  try {
+    const parsedUrl = new URL(targetUrl);
+    if (!ALLOWED_DOMAINS.includes(parsedUrl.hostname)) {
+      console.warn(`[proxy] Domínio bloqueado: ${parsedUrl.hostname}`);
+      return res.status(403).json({
+        error: `Domínio '${parsedUrl.hostname}' não permitido pelo proxy.`,
+        allowed: ALLOWED_DOMAINS,
+      });
+    }
+  } catch (urlErr) {
+    return res.status(400).json({ error: "URL inválida fornecida ao proxy." });
   }
 
   try {
