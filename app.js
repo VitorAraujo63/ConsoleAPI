@@ -108,6 +108,84 @@ window.API_REGISTRY = {
           },
         }),
       },
+      {
+        id: "users",
+        label: "Usuário (User Info)",
+        fields: [
+          {
+            name: "accessToken",
+            label: "Access Token",
+            type: "text",
+            required: true,
+            placeholder: "APP_USR-...",
+          },
+          {
+            name: "userId",
+            label: "User ID",
+            type: "text",
+            required: true,
+            placeholder: "ex: 123456789",
+          },
+        ],
+        build: (p) => ({
+          url: `https://api.mercadolibre.com/users/${encodeURIComponent(p.userId)}?access_token=${encodeURIComponent(p.accessToken)}`,
+          options: {
+            method: "GET",
+          },
+        }),
+      },
+      {
+        id: "billing_info",
+        label: "Faturamento (Billing Info)",
+        fields: [
+          {
+            name: "accessToken",
+            label: "Access Token",
+            type: "text",
+            required: true,
+            placeholder: "APP_USR-...",
+          },
+          {
+            name: "orderId",
+            label: "Order ID",
+            type: "text",
+            required: true,
+            placeholder: "ex: 2000007654321",
+          },
+        ],
+        build: (p) => ({
+          url: `https://api.mercadolibre.com/orders/${encodeURIComponent(p.orderId)}/billing_info?access_token=${encodeURIComponent(p.accessToken)}`,
+          options: {
+            method: "GET",
+          },
+        }),
+      },
+      {
+        id: "category",
+        label: "Categoria (Category)",
+        fields: [
+          {
+            name: "accessToken",
+            label: "Access Token",
+            type: "text",
+            required: true,
+            placeholder: "APP_USR-...",
+          },
+          {
+            name: "categoryId",
+            label: "Category ID (MLB...)",
+            type: "text",
+            required: true,
+            placeholder: "ex: MLB1234",
+          },
+        ],
+        build: (p) => ({
+          url: `https://api.mercadolibre.com/categories/${encodeURIComponent(p.categoryId)}?access_token=${encodeURIComponent(p.accessToken)}`,
+          options: {
+            method: "GET",
+          },
+        }),
+      },
     ],
   },
 
