@@ -176,6 +176,11 @@
   // ── Submit ───────────────────────────────────────────────────
   form.addEventListener("submit", (e) => {
     e.preventDefault();
+
+    // Feedback visual: desabilita o botão e mostra loading
+    submitBtn.disabled = true;
+    submitBtn.textContent = "⏳ Consultando...";
+
     const data   = new FormData(form);
     const params = {};
     for (const [k, v] of data.entries()) params[k] = v;

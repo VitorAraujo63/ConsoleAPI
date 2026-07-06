@@ -4,12 +4,14 @@
  * Rota: /proxy/* → repassa a requisição para a API externa correspondente.
  */
 
-const express = require("express");
-const fetch   = require("node-fetch");
-const path    = require("path");
+const express    = require("express");
+const fetch      = require("node-fetch");
+const path       = require("path");
+const helmet     = require("helmet");
+const rateLimit  = require("express-rate-limit");
 
 const app  = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 // ── Segurança ──────────────────────────────────────────────
 // Domínios permitidos pelo proxy (previne ataques SSRF)
@@ -18,14 +20,38 @@ const ALLOWED_DOMAINS = [
   "www.jadlog.com.br",
 ];
 
+// Timeout para requisições do proxy (em milissegundos)
+const PROXY_TIMEOUT_MS = 15000;
+
 // ── Middleware ──────────────────────────────────────────────
+// Security headers (X-Content-Type-Options, X-Frame-Options, etc.)
+app.use(helmet({
+  contentSecurityPolicy: false, // desabilitado para não bloquear scripts inline e CDNs
+  crossOriginEmbedderPolicy: false,
+}));
+
+// Rate Limiting: máximo de 60 requisições por minuto por IP
+const proxyLimiter = rateLimit({
+  windowMs: 60 * 1000,     // 1 minuto
+  max: 60,                 // limite por IP
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Muitas requisições. Aguarde um momento e tente novamente." },
+});
+
 app.use(express.json({ limit: "2mb" }));  // Limita payload para prevenir sobrecarga de memória
 app.use(express.static(path.join(__dirname)));   // Serve os arquivos HTML/CSS/JS
+
+// ── Health Check ────────────────────────────────────────────
+// Endpoint usado pelo Render (e outros hosts) para verificar se o app está vivo
+app.get("/health", (_req, res) => {
+  res.status(200).json({ status: "ok", uptime: process.uptime() });
+});
 
 // ── Rota genérica de proxy ──────────────────────────────────
 // Front-end chama: POST/GET /proxy?url=<url_destino>
 // Servidor repassa para <url_destino> com os mesmos headers e body.
-app.all("/proxy", async (req, res) => {
+app.all("/proxy", proxyLimiter, async (req, res) => {
   const targetUrl = req.query.url;
 
   if (!targetUrl) {
@@ -57,10 +83,10 @@ app.all("/proxy", async (req, res) => {
       }
     }
 
-    // Reconstrói a URL com os query params da API destino (tudo após &, passado no body ou header)
     const fetchOptions = {
       method:  req.method,
       headers: forwardHeaders,
+      timeout: PROXY_TIMEOUT_MS,
     };
 
     // Repassa o body somente para métodos que o suportam
@@ -78,12 +104,43 @@ app.all("/proxy", async (req, res) => {
 
   } catch (err) {
     console.error("[proxy] Erro:", err.message);
+
+    if (err.type === "request-timeout" || err.name === "AbortError") {
+      return res.status(504).json({ error: "A API externa demorou demais para responder (timeout de 15s)." });
+    }
+
     res.status(502).json({ error: `Erro ao chamar API externa: ${err.message}` });
   }
 });
 
-// ── Start ───────────────────────────────────────────────────
-app.listen(PORT, () => {
-  console.log(`\n✅ API Console rodando em http://localhost:${PORT}\n`);
-  console.log("   Abra http://localhost:3000 no navegador.\n");
+// ── Página 404 ──────────────────────────────────────────────
+// Captura qualquer rota não encontrada e retorna a página 404
+app.use((_req, res) => {
+  res.status(404).sendFile(path.join(__dirname, "404.html"));
 });
+
+// ── Start ───────────────────────────────────────────────────
+const server = app.listen(PORT, () => {
+  console.log(`\n✅ API Console rodando em http://localhost:${PORT}\n`);
+  console.log(`   Abra http://localhost:${PORT} no navegador.\n`);
+});
+
+// ── Graceful Shutdown ───────────────────────────────────────
+// Quando o Render (ou outro host) envia SIGTERM para reiniciar/deploy,
+// fecha as conexões abertas de forma limpa antes de encerrar.
+function gracefulShutdown(signal) {
+  console.log(`\n⚠️  Sinal ${signal} recebido. Encerrando servidor...`);
+  server.close(() => {
+    console.log("✅ Servidor encerrado com sucesso.");
+    process.exit(0);
+  });
+
+  // Se demorar mais de 10s, força o encerramento
+  setTimeout(() => {
+    console.error("⛔ Forçando encerramento após timeout.");
+    process.exit(1);
+  }, 10000);
+}
+
+process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
+process.on("SIGINT",  () => gracefulShutdown("SIGINT"));
