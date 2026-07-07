@@ -250,6 +250,7 @@ window.API_REGISTRY = {
       {
         id: "preco",
         label: "2. Consultar Preço",
+        requiresAuth: true,  // Bloqueado até o usuário completar a etapa 1 (autenticação)
         fields: [
           {
             name: "token",

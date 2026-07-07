@@ -35,20 +35,43 @@
   // ── Picker ──────────────────────────────────────────────────
   function renderPicker() {
     pickerEl.innerHTML = "";
+
+    // Verifica se o usuário veio da autenticação (tem token no prefill)
+    const isAuthenticated = prefill.token != null && String(prefill.token).trim() !== "";
+
     api.endpoints.forEach((ep) => {
       const btn = document.createElement("button");
       btn.type      = "button";
       btn.id        = `tab-${ep.id}`;
-      btn.className = "endpoint-tab" + (ep.id === currentEndpointId ? " active" : "");
-      btn.textContent = ep.label;
-      btn.addEventListener("click", () => {
-        currentEndpointId = ep.id;
-        prefill = {};           // clear prefill when manually switching
-        renderPicker();
-        renderFields();
-      });
+
+      // Bloqueia a aba se o endpoint exige autenticação e o usuário não autenticou
+      const isLocked = ep.requiresAuth && !isAuthenticated;
+
+      if (isLocked) {
+        btn.className = "endpoint-tab locked";
+        btn.textContent = `${ep.label}`;
+        btn.title = "Complete a etapa 1 (Autenticação) primeiro para desbloquear.";
+        btn.disabled = true;
+      } else {
+        btn.className = "endpoint-tab" + (ep.id === currentEndpointId ? " active" : "");
+        btn.textContent = ep.label;
+        btn.addEventListener("click", () => {
+          currentEndpointId = ep.id;
+          if (!ep.requiresAuth) prefill = {};  // limpa prefill apenas ao trocar para aba que não exige auth
+          renderPicker();
+          renderFields();
+        });
+      }
+
       pickerEl.appendChild(btn);
     });
+
+    // Se o endpoint atual está bloqueado, força voltar para o primeiro
+    const currentEp = api.endpoints.find((e) => e.id === currentEndpointId);
+    if (currentEp && currentEp.requiresAuth && !isAuthenticated) {
+      currentEndpointId = api.endpoints[0].id;
+      renderFields();
+    }
   }
 
   // ── Mapa de máscaras por nome de campo ─────────────────────

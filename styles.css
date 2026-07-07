@@ -139,6 +139,13 @@ a { color: inherit; text-decoration: none; }
 .endpoint-tab.active {
   background: var(--primary); color: white; border-color: var(--primary);
 }
+.endpoint-tab.locked {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+  position: relative;
+  border-style: dashed;
+}
 
 .form { display: grid; gap: 16px; }
 .field { display: grid; gap: 6px; }
