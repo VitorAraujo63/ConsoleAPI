@@ -189,8 +189,8 @@ button { font-family: inherit; }
 
 /* ── Endpoint Picker ──────────────────────────────────────── */
 .endpoint-picker {
-  display: flex; gap: 8px; margin-bottom: 32px; overflow-x: auto;
-  padding-bottom: 8px; border-bottom: 1px solid var(--glass-border);
+  display: flex; gap: 8px; margin-bottom: 32px; flex-wrap: wrap;
+  padding-bottom: 12px; border-bottom: 1px solid var(--glass-border);
 }
 .endpoint-tab {
   padding: 10px 20px; border-radius: 99px; background: transparent; border: 1px solid transparent;
@@ -323,7 +323,7 @@ button { font-family: inherit; }
   flex-shrink: 0; width: 320px;
 }
 .layout-main {
-  flex: 1; margin-bottom: 0;
+  flex: 1; margin-bottom: 0; min-width: 0;
 }
 .history-sidebar {
   background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 16px;
