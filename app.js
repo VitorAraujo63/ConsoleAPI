@@ -281,7 +281,7 @@ window.API_REGISTRY = {
             label: "Código de Serviço (Correios)",
             type: "text",
             required: true,
-            placeholder: "ex: 03298",
+            placeholder: "03220 (SEDEX) e 03298 (PAC) ",
             hint: "Código do serviço de envio (SEDEX, PAC, etc.).",
           },
           {
@@ -393,7 +393,7 @@ window.API_REGISTRY = {
             label: "Código de Serviço (Correios)",
             type: "text",
             required: true,
-            placeholder: "03220 (SEDEX), 03298 (PAC)",
+            placeholder: "03220 (SEDEX) e 03298 (PAC)",
             hint: "Código do serviço de envio (SEDEX, PAC, etc.).",
           },
           {
