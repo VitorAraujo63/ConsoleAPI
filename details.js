@@ -257,12 +257,17 @@
     try { history = JSON.parse(localStorage.getItem("historico_console") || "[]"); }
     catch (_) {}
 
+    const layoutSidebar = panel.closest('.layout-sidebar');
+    const layoutGrid = panel.closest('.layout-grid');
+
     if (history.length === 0) {
-      panel.classList.add("hidden");
+      if (layoutSidebar) layoutSidebar.classList.add("hidden");
+      if (layoutGrid) layoutGrid.classList.add("centered");
       return;
     }
 
-    panel.classList.remove("hidden");
+    if (layoutSidebar) layoutSidebar.classList.remove("hidden");
+    if (layoutGrid) layoutGrid.classList.remove("centered");
     listEl.innerHTML = "";
 
     // Toggle expand/collapse

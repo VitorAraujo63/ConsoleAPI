@@ -319,9 +319,12 @@ button { font-family: inherit; }
 .layout-grid {
   display: flex; gap: 32px; align-items: flex-start; max-width: 1100px; margin: 0 auto 80px;
 }
+.layout-grid.centered { justify-content: center; }
+.layout-grid.centered .layout-main { flex: none; width: 100%; max-width: 760px; }
 .layout-sidebar {
   flex-shrink: 0; width: 320px;
 }
+.layout-sidebar.hidden { display: none !important; }
 .layout-main {
   flex: 1; margin-bottom: 0; min-width: 0;
 }
