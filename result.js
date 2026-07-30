@@ -70,7 +70,7 @@
         localStorage.setItem("historico_console", JSON.stringify(history.slice(0, MAX_HISTORY)));
       } catch (_) { /* localStorage indisponível — ignora silenciosamente */ }
 
-      // ── Chain flow (Correios auth → price) ──────────────────
+      // ── Chain flow (Correios auth → escolha Preço ou Prazo) ────
       if (isChain && endpoint.chainTo && endpoint.chainExtract && res.ok) {
         const { api: nextApi, endpoint: nextEp } = endpoint.chainTo;
         const prefill = {};
@@ -80,14 +80,57 @@
           if (val != null) prefill[fieldName] = val;
         }
 
-        if (chainBtnEl) {
+        // Se o destino é "__choose__", mostra popup para o usuário escolher
+        if (nextEp === "__choose__") {
+          // Cria o overlay do popup
+          const overlay = document.createElement("div");
+          overlay.className = "chain-popup-overlay";
+          overlay.innerHTML = `
+            <div class="chain-popup">
+              <div class="chain-popup-icon">✅</div>
+              <h2>Autenticação realizada com sucesso!</h2>
+              <p class="muted">Escolha o tipo de consulta que deseja realizar:</p>
+              <div class="chain-popup-actions">
+                <button class="btn btn-primary chain-popup-btn" id="choose-preco">
+                  💰 Calcular Valor
+                </button>
+                <button class="btn btn-primary chain-popup-btn" id="choose-prazo" style="background: linear-gradient(135deg, #22c55e, #16a34a);">
+                  📦 Calcular Prazo
+                </button>
+              </div>
+            </div>
+          `;
+          document.body.appendChild(overlay);
+
+          // Anima a entrada
+          requestAnimationFrame(() => overlay.classList.add("visible"));
+
+          // Listener: Calcular Valor
+          document.getElementById("choose-preco").addEventListener("click", () => {
+            const q = new URLSearchParams({
+              api: nextApi, endpoint: "preco",
+              prefill: JSON.stringify(prefill),
+            });
+            location.href = `./details.html?${q.toString()}`;
+          });
+
+          // Listener: Calcular Prazo
+          document.getElementById("choose-prazo").addEventListener("click", () => {
+            const q = new URLSearchParams({
+              api: nextApi, endpoint: "prazo",
+              prefill: JSON.stringify(prefill),
+            });
+            location.href = `./details.html?${q.toString()}`;
+          });
+
+        } else if (chainBtnEl) {
+          // Fallback para chains diretas (não-popup)
           chainBtnEl.classList.remove("hidden");
-          chainBtnEl.textContent = "Prosseguir para consulta de preço →";
+          chainBtnEl.textContent = "Prosseguir →";
           chainBtnEl.addEventListener("click", () => {
             const q = new URLSearchParams({
-              api:      nextApi,
-              endpoint: nextEp,
-              prefill:  JSON.stringify(prefill),
+              api: nextApi, endpoint: nextEp,
+              prefill: JSON.stringify(prefill),
             });
             location.href = `./details.html?${q.toString()}`;
           });

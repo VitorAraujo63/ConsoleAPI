@@ -227,8 +227,8 @@ window.API_REGISTRY = {
             hint: "Número do cartão de postagem associado ao contrato.",
           },
         ],
-        // Após autenticar com sucesso, encadeia para a próxima etapa
-        chainTo: { api: "correios", endpoint: "preco" },
+        // Após autenticar com sucesso, mostra popup para escolher entre Preço ou Prazo
+        chainTo: { api: "correios", endpoint: "__choose__" },
         // Extrai do JSON de resposta os campos necessários para a próxima etapa
         chainExtract: {
           token: "token",
@@ -278,7 +278,7 @@ window.API_REGISTRY = {
           },
           {
             name: "coProduto",
-            label: "Código do Produto (Serviço)",
+            label: "Código de Serviço (Correios)",
             type: "text",
             required: true,
             placeholder: "ex: 03298",
@@ -367,6 +367,57 @@ window.API_REGISTRY = {
           }
           return {
             url: proxyUrl(`https://api.correios.com.br/preco/v1/nacional/${encodeURIComponent(p.coProduto)}?${qs.toString()}`),
+            options: {
+              method: "GET",
+              headers: { Authorization: `Bearer ${p.token}` },
+            },
+          };
+        },
+      },
+      {
+        id: "prazo",
+        label: "3. Consultar Prazo",
+        requiresAuth: true,
+        fields: [
+          {
+            name: "token",
+            label: "Bearer Token",
+            type: "text",
+            required: true,
+            placeholder: "eyJhbGciOi...",
+            hint: "Token retornado na etapa de autenticação (preenchido automaticamente).",
+          },
+          {
+            name: "coProduto",
+            label: "Código de Serviço (Correios)",
+            type: "text",
+            required: true,
+            placeholder: "03220 (SEDEX) ",
+            hint: "Código do serviço de envio (SEDEX, PAC, etc.).",
+          },
+          {
+            name: "cepOrigem",
+            label: "CEP Origem",
+            type: "text",
+            required: true,
+            placeholder: "ex: 82600000",
+          },
+          {
+            name: "cepDestino",
+            label: "CEP Destino",
+            type: "text",
+            required: true,
+            placeholder: "ex: 09185670",
+          },
+        ],
+        build: (p) => {
+          const cepOri = String(p.cepOrigem || "").replace(/\D/g, "");
+          const cepDes = String(p.cepDestino || "").replace(/\D/g, "");
+          const qs = new URLSearchParams();
+          qs.set("cepOrigem", cepOri);
+          qs.set("cepDestino", cepDes);
+          return {
+            url: proxyUrl(`https://api.correios.com.br/prazo/v1/nacional/${encodeURIComponent(p.coProduto)}?${qs.toString()}`),
             options: {
               method: "GET",
               headers: { Authorization: `Bearer ${p.token}` },
