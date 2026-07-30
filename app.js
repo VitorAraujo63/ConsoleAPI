@@ -332,10 +332,11 @@ window.API_REGISTRY = {
             label: "Tipo de Objeto *",
             type: "select",
             required: true,
-            default: "1",
+            default: "2",
             options: [
-              { value: "1", label: "1 — Envelope/Caixa" },
-              { value: "2", label: "2 — Rolo/Tubo" },
+              { value: "1", label: "1 — Envelope" },
+              { value: "2", label: "2 — Pacote ou Caixa" },
+              { value: "3", label: "3 — Rolo ou Cilindro" },
             ],
           },
           {
@@ -355,7 +356,7 @@ window.API_REGISTRY = {
           qs.set("largura", p.largura);
           qs.set("altura", p.altura);
           qs.set("comprimento", p.comprimento);
-          qs.set("tpObjeto", p.tpObjeto || "1");
+          qs.set("tpObjeto", p.tpObjeto || "2");
           qs.set("nuContrato", p.nuContrato);
           qs.set("nuDR", p.nuDR);
           if (p.vlDeclarado && String(p.vlDeclarado).trim() !== "") {
@@ -392,7 +393,7 @@ window.API_REGISTRY = {
             label: "Código de Serviço (Correios)",
             type: "text",
             required: true,
-            placeholder: "03220 (SEDEX) ",
+            placeholder: "03220 (SEDEX), 03298 (PAC)",
             hint: "Código do serviço de envio (SEDEX, PAC, etc.).",
           },
           {
