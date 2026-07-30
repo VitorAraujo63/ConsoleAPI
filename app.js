@@ -636,3 +636,38 @@ window.APIUtils = {
     );
   },
 };
+
+// ─────────────────────────────────────────────────────────────
+// Theme Toggle (Light/Dark)
+// ─────────────────────────────────────────────────────────────
+(function () {
+  const STORAGE_KEY = "api-console-theme";
+
+  // Aplica o tema salvo ou usa dark como padrão
+  function applyTheme(theme) {
+    document.documentElement.setAttribute("data-theme", theme);
+    const btn = document.getElementById("theme-toggle");
+    if (btn) btn.textContent = theme === "dark" ? "☀️" : "🌙";
+  }
+
+  // Inicializa na carga da página
+  const saved = localStorage.getItem(STORAGE_KEY) || "dark";
+  applyTheme(saved);
+
+  // Aguarda o DOM carregar para conectar o botão
+  document.addEventListener("DOMContentLoaded", () => {
+    const btn = document.getElementById("theme-toggle");
+    if (!btn) return;
+
+    // Atualiza o ícone corretamente após o DOM estar pronto
+    const current = document.documentElement.getAttribute("data-theme") || "dark";
+    btn.textContent = current === "dark" ? "☀️" : "🌙";
+
+    btn.addEventListener("click", () => {
+      const current = document.documentElement.getAttribute("data-theme") || "dark";
+      const next = current === "dark" ? "light" : "dark";
+      localStorage.setItem(STORAGE_KEY, next);
+      applyTheme(next);
+    });
+  });
+})();

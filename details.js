@@ -83,9 +83,15 @@
     cnpj:       { mask: "00.000.000/0000-00" },
     numero:     { mask: "0000000000" },
   };
+  
+  const activeMasks = {};
 
   // ── Fields ──────────────────────────────────────────────────
   function renderFields() {
+    // Limpa instâncias antigas de máscara para evitar vazamentos de memória
+    Object.values(activeMasks).forEach(m => m.destroy && m.destroy());
+    for (const k in activeMasks) delete activeMasks[k];
+
     const ep = api.endpoints.find((e) => e.id === currentEndpointId);
     fieldsEl.innerHTML = "";
 
@@ -132,6 +138,7 @@
       } else {
         input = document.createElement("input");
         input.type = f.type || "text";
+        if (input.type === "number") input.step = "any";
         if (f.min != null) input.min = f.min;
         if (f.max != null) input.max = f.max;
       }
@@ -184,7 +191,9 @@
 
       // ── Aplicar máscara IMask (se disponível) ────────────────
       if (typeof IMask !== "undefined" && MASK_MAP[f.name] && input.tagName === "INPUT") {
-        IMask(input, MASK_MAP[f.name]);
+        activeMasks[f.name] = IMask(input, MASK_MAP[f.name]);
+        // Validação HTML nativa para garantir a quantidade correta de caracteres (CNPJ: 18, CEP: 9)
+        input.minLength = MASK_MAP[f.name].mask.length;
       }
     });
 
@@ -206,7 +215,14 @@
 
     const data   = new FormData(form);
     const params = {};
-    for (const [k, v] of data.entries()) params[k] = v;
+    for (const [k, v] of data.entries()) {
+      // Se houver máscara, usamos unmaskedValue para extrair apenas os números (remove '.', '/', '-')
+      if (activeMasks[k]) {
+        params[k] = activeMasks[k].unmaskedValue;
+      } else {
+        params[k] = v;
+      }
+    }
 
     // Also include any readOnly prefilled fields not captured by FormData
     const ep = api.endpoints.find((x) => x.id === currentEndpointId);
