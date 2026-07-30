@@ -268,6 +268,7 @@
 
     if (layoutSidebar) layoutSidebar.classList.remove("hidden");
     if (layoutGrid) layoutGrid.classList.remove("centered");
+    panel.classList.remove("hidden");
     listEl.innerHTML = "";
 
     // Toggle expand/collapse
